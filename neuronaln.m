@@ -8,13 +8,13 @@ inputs = Xtrain';
 targets = Ytrain';
 
 % Create a Fitting Network
-hiddenLayerSize = 5;
-net = fitnet(hiddenLayerSize);
+hiddenLayerSize = 3500;
+net = patternnet(hiddenLayerSize);
 
 % Setup Division of Data for Training, Validation, Testing
 net.divideParam.trainRatio = 70/100;
-net.divideParam.valRatio = 11/100;
-net.divideParam.testRatio = 11/100;
+net.divideParam.valRatio = 15/100;
+net.divideParam.testRatio = 15/100;
 
 % Train the Network
 [net,~] = train(net,inputs,targets,'useParallel','yes');

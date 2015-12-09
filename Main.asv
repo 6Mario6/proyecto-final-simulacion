@@ -50,8 +50,8 @@ if punto==1
         [Xtrain,mu,sigma]=zscore(Xtrain);
         Xtest=normalizar(Xtest,mu,sigma);
          %%%  %%%
-        Modelo = ClassificationDiscriminant.fit(Xtrain,Ytrain,'discrimType','diagLinear');
-        Yest = Modelo.predict(Xtest);
+        Yest = classify(Xtest,Xtrain,Ytrain,'discrimType','diagLinear');
+        % Yest = Modelo.predict(Xtest);
         % Compute the confusion matrix
         C_D = confusionmat(Ytest,Yest);
         % Examine the confusion matrix for each class as a percentage of the true class
