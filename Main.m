@@ -6,7 +6,7 @@ clear all
 eta=0.1; %%% Taza de aprendizaje
 grado=1;     %%% Grado del polinomio
 
-punto=input('Ingrese, 1 para Classification Discriminant, 2 para k vecinos Cercanos, 3 para Redes Neuronales, 4 para Random Fores, 5 para  SVM ');
+punto=input('Ingrese, 1 para Classification Discriminant, 2 para k vecinos Cercanos, 3 para Redes Neuronales, 4 para Random Forest, 5 para  SVM ');
 
 if punto==1
     
@@ -160,10 +160,6 @@ elseif punto==3
     countElY=histc(Y,unqY);
     relFreqY=countElY/numel(Y);
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-    %%% Se cambia el grado del polinomio %%%
-
-    
     for fold=1:Rept
         %%% Se hace la partición de las muestras %%%
         %%%      de entrenamiento y prueba       %%%
@@ -204,7 +200,64 @@ elseif punto==3
     disp(Texto);
     Texto=['El error de clasificación en prueba es: ',num2str(Error)];
     disp(Texto);
-elseif punto==4
+elseif punto==4    
+    %%% Random Forest %%%
+    fprintf('Random Forest...\n');
+    load('DataTest.mat');
+    N=size(X,1);
+    Rept=10;
+    N=N*0.3;
+    Y(Y<=1000)=1;
+    Y(Y>1000 & Y<=2000)=2;
+    Y(Y>2000)=3;
+    NumClases=length(unique(Y)); %%% Se determina el número de clases del problema.
+    EficienciaTest=zeros(1,Rept);
+
+    unqY=unique(Y);
+    countElY=histc(Y,unqY);
+    relFreqY=countElY/numel(Y);
+    for fold=1:Rept
+        %%% Se hace la partición de las muestras %%%
+        %%%      de entrenamiento y prueba       %%%
+        rng('default');
+        particion=cvpartition(N,'Kfold',Rept);
+        Xtrain=X(particion.training(fold),:);
+        Xtest=X(particion.test(fold),:);
+        Ytrain=Y(particion.training(fold),:);
+        Ytest=Y(particion.test(fold));
+ 
+         %%% Normalización %%%
+    
+        [Xtrain,mu,sigma]=zscore(Xtrain);
+        Xtest=normalizar(Xtest,mu,sigma);
+        
+        
+        NumArboles=5;
+        Modelo=entrenarFOREST(NumArboles,Xtrain,Ytrain);
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+         %%% Validación de los modelos. %%%
+        Yest=testFOREST(Modelo,Xtest);
+        Yest = round(Yest);
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        MatrizConfusion=zeros(NumClases,NumClases);
+        for i=1:size(Xtest,1)
+            MatrizConfusion(Yest(i),Ytest(i))=MatrizConfusion(Yest(i),Ytest(i)) + 1;
+        end
+        EficienciaTest(fold)=sum(diag(MatrizConfusion))/sum(sum(MatrizConfusion));
+            
+    end
+   
+    Eficiencia = mean(EficienciaTest);
+    Error=1-Eficiencia;
+    IC = std(EficienciaTest);
+    MatrizConfusion
+    Texto=['La eficiencia obtenida fue = ', num2str(Eficiencia),' +- ',num2str(IC)];
+    disp(Texto);
+    Texto=['El error de clasificación en prueba es: ',num2str(Error)];
+    disp(Texto);
+    
+elseif punto==5
     %%% Se crean los datos de forma aleatoria %%%
     boxConstraint=100;
     gamma=100;
