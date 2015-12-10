@@ -232,7 +232,7 @@ elseif punto==4
         Xtest=normalizar(Xtest,mu,sigma);
         
         
-        NumArboles=5;
+        NumArboles=500;
         Modelo=entrenarFOREST(NumArboles,Xtrain,Ytrain);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
          %%% Validación de los modelos. %%%
@@ -258,9 +258,11 @@ elseif punto==4
     disp(Texto);
     
 elseif punto==5
+   %%%SVM%%%
+    fprintf('SVM')
     %%% Se crean los datos de forma aleatoria %%%
     boxConstraint=100;
-    gamma=100;
+    gamma=10;
     load('DataTest.mat');
     N=size(X,1);
     Rept=10;
@@ -312,39 +314,32 @@ elseif punto==5
         for j=1:NumClases
             Yestall(:,j) = testSVM(Modelo{j},Xtest); % se obtiene la predicción de cada modelo
         end
-         % Se crea el vector de predicciones con las clases a la que
-         % pertenece cada muestra. Luego se procede a actualizar aquellas
-         % que presentan conflicto
+        
         [~,Yest] = max(Yestall,[],2);
-        %Se evaluan todas las muestras de prueba para determinar conflictos
+        
         for i=1:numTest
-            % se encuentran las predicciones iguales para una misma 
-            % muestra por medio de un histograma
+           
             [n, bin] = histc(Yestall(i,:), unique(Yestall(i,:))); 
             multiple = find(n > 1);
-            index = find(ismember(bin, multiple)); % clases en conflicto
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            numEquals = size(index,2); % numero de clases en conflicto
-            
-            % Si el valor en conflicto de la prediccion es 1, o si hay 3
-            % valores iguales (en el caso de los tres en -1), se procede
-            % a resolver el conflicto con la evaluacion de la funcion
+            index = find(ismember(bin, multiple)); 
+            numEquals = size(index,2); 
+           
             if Yestall(i,index(1,1)) == 1 || numEquals == NumClases 
                 evalY = zeros(1,numEquals);
                 for l=1:numEquals
-                    indices=find(Modelo{index(l)}.selector); % indices de los vectores de soporte
-                    SupportVectors = Xtrain(indices,:); % vectores de soporte
-                    SupportVectorsTargets=targets(indices,index(l)); % targets de los vectores de soporte
+                    indices=find(Modelo{index(l)}.selector);
+                    SupportVectors = Xtrain(indices,:);
+                    SupportVectorsTargets=targets(indices,index(l)); 
                     evalY(1,l)= evaluarFuncioSVM(Modelo{index(l)}.alpha,...
                         Modelo{index(l)}.b,SupportVectorsTargets,...
-                        SupportVectors,Xtest(i,:),gamma,'gauss'); % se evalua cada clase en conflicto
+                        SupportVectors,Xtest(i,:),gamma,'gauss'); 
                 end
-                if numEquals == NumClases % si la muestra no quedo en ninguna clase (las 3 en -1)
-                    [~,classInd] = min(evalY); % se escoge la mas cercana
-                else % si la muestra quedo en más de una clase
-                    [~,classInd] = max(evalY); % se escoge la más lejana
+                if numEquals == NumClases 
+                    [~,classInd] = min(evalY);
+                else
+                    [~,classInd] = max(evalY); 
                 end
-                Yest(i) = classInd; % se actualiza el vector con las decisiones
+                Yest(i) = classInd; 
             end
         end
 
