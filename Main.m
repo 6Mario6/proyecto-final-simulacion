@@ -14,10 +14,11 @@ if punto==1
     fprintf('Discriminante gaussiano')
     %%% Se crean los datos de forma aleatoria %%%
     load('DataTest.mat');
+    %load('DGsfs.mat'); caracteristicas sfs
     N=size(X,1);
     Rept=10;
     N=N*0.3;
-  
+   % X(:,~featuresForY1)=[]; caracteristicas sfs
     Y(Y<=1000)=1;
     Y(Y>1000 & Y<=2000)=2;
     Y(Y>2000)=3;
@@ -79,10 +80,11 @@ elseif punto==2
     fprintf('k vecinos Cercanos')
    %%% Se crean los datos de forma aleatoria %%%
     load('DataTest.mat');
+    load('KNsfs.mat');
     N=size(X,1);
     Rept=10;
     N=N*0.3;
-  
+    X(:,~featuresForY3)=[];
     Y(Y<=1000)=1;
     Y(Y>1000 & Y<=2000)=2;
     Y(Y>2000)=3;
@@ -146,9 +148,11 @@ elseif punto==3
     fprintf('Redes Neuronales')
     %%% Se crean los datos de forma aleatoria %%%
     load('DataTest.mat');
+   %load('DGsfs.mat'); caracteristicas sfs
     N=size(X,1);
     Rept=10;
     N=N*0.3;
+   % X(:,~featuresForY1)=[]; caracteristicas sfs
   
     Y(Y<=1000)=1;
     Y(Y>1000 & Y<=2000)=2;
@@ -204,9 +208,11 @@ elseif punto==4
     %%% Random Forest %%%
     fprintf('Random Forest...\n');
     load('DataTest.mat');
+    load('RFsfs.mat');
     N=size(X,1);
     Rept=10;
     N=N*0.3;
+    X(:,~featuresForY2)=[];
     Y(Y<=1000)=1;
     Y(Y>1000 & Y<=2000)=2;
     Y(Y>2000)=3;
