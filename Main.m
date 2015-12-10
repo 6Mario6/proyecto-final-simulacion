@@ -80,8 +80,8 @@ elseif punto==2
    %%% Se crean los datos de forma aleatoria %%%
     load('DataTest.mat');
     N=size(X,1);
-    Rept=1;
-    N=N*0.1;
+    Rept=10;
+    N=N*0.3;
   
     Y(Y<=1000)=1;
     Y(Y>1000 & Y<=2000)=2;
@@ -262,13 +262,13 @@ elseif punto==5
     fprintf('SVM')
     %%% Se crean los datos de forma aleatoria %%%
     boxConstraint=100;
-    % gamma=10;
-    gamma=[0.01,0.1,1,10,100];
-    for g=1:5
+    gamma=100;
+    %gamma=[0.01,0.1,1,10,100];
+    %for g=1:5
     load('DataTest.mat');
     N=size(X,1);
     Rept=10;
-    N=N*0.3;
+    N=N*0.1;
   
     Y(Y<=1000)=1;
     Y(Y>1000 & Y<=2000)=2;
@@ -308,7 +308,7 @@ elseif punto==5
             Ytraini(Ytraini~=i)=-1;
             Ytraini(Ytraini==i)=1;
             targets(:,i) = Ytraini; % los targets son 1 para la clase y -1 en otro caso
-            Modelo{i} = entrenarSVM(Xtrain,targets(:,i),'c',boxConstraint,gamma(g),'RBF_kernel');
+            Modelo{i} = entrenarSVM(Xtrain,targets(:,i),'c',boxConstraint,gamma,'RBF_kernel');
         end
         numTest = size(Ytest,1);
         % Se realizan las predicciones usando los 3 clasificadores
@@ -334,7 +334,7 @@ elseif punto==5
                     SupportVectorsTargets=targets(indices,index(l)); 
                     evalY(1,l)= evaluarFuncioSVM(Modelo{index(l)}.alpha,...
                         Modelo{index(l)}.b,SupportVectorsTargets,...
-                        SupportVectors,Xtest(i,:),gamma(g),'linear'); 
+                        SupportVectors,Xtest(i,:),gamma,'linear'); 
                 end
                 if numEquals == NumClases 
                     [~,classInd] = min(evalY);
@@ -362,6 +362,6 @@ elseif punto==5
     disp(Texto);
     Texto=['El error de clasificación en prueba es: ',num2str(Error)];
     disp(Texto);
-    end   
-end
+ end   
+%end
 
