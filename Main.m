@@ -50,8 +50,8 @@ if punto==1
         [Xtrain,mu,sigma]=zscore(Xtrain);
         Xtest=normalizar(Xtest,mu,sigma);
          %%%  %%%
-        Modelo = ClassificationDiscriminant.fit(Xtrain,Ytrain,'discrimType','diagLinear');
-        Yest = Modelo.predict(Xtest);
+        Yest  =classify(Xtest,Xtrain,Ytrain,'diagquadratic');
+        
         % Compute the confusion matrix
         C_D = confusionmat(Ytest,Yest);
         % Examine the confusion matrix for each class as a percentage of the true class
@@ -262,7 +262,9 @@ elseif punto==5
     fprintf('SVM')
     %%% Se crean los datos de forma aleatoria %%%
     boxConstraint=100;
-    gamma=10;
+    % gamma=10;
+    gamma=[0.01,0.1,1,10,100];
+    for g=1:5
     load('DataTest.mat');
     N=size(X,1);
     Rept=10;
@@ -306,7 +308,7 @@ elseif punto==5
             Ytraini(Ytraini~=i)=-1;
             Ytraini(Ytraini==i)=1;
             targets(:,i) = Ytraini; % los targets son 1 para la clase y -1 en otro caso
-            Modelo{i} = entrenarSVM(Xtrain,targets(:,i),'c',boxConstraint,gamma,'RBF_kernel');
+            Modelo{i} = entrenarSVM(Xtrain,targets(:,i),'c',boxConstraint,gamma(g),'RBF_kernel');
         end
         numTest = size(Ytest,1);
         % Se realizan las predicciones usando los 3 clasificadores
@@ -332,7 +334,7 @@ elseif punto==5
                     SupportVectorsTargets=targets(indices,index(l)); 
                     evalY(1,l)= evaluarFuncioSVM(Modelo{index(l)}.alpha,...
                         Modelo{index(l)}.b,SupportVectorsTargets,...
-                        SupportVectors,Xtest(i,:),gamma,'gauss'); 
+                        SupportVectors,Xtest(i,:),gamma(g),'linear'); 
                 end
                 if numEquals == NumClases 
                     [~,classInd] = min(evalY);
@@ -342,12 +344,6 @@ elseif punto==5
                 Yest(i) = classInd; 
             end
         end
-
-        % Compute the confusion matrix
-        C_nn = confusionmat(Ytest,Yest);
-        % Examine the confusion matrix for each class as a percentage of the true class
-        C_nn = bsxfun(@rdivide,C_nn,sum(C_nn,2)) * 100
-       
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         MatrizConfusion=zeros(NumClases,NumClases);
@@ -366,6 +362,6 @@ elseif punto==5
     disp(Texto);
     Texto=['El error de clasificación en prueba es: ',num2str(Error)];
     disp(Texto);
-    
+    end   
 end
 
